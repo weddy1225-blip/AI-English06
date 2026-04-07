@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 尋找地圖大冒險 🌟</title>
+    <style>
+        :root { 
+            --main-green: #27AE60;
+            --light-green: #E8F5E9;
+            --dark-green: #1E8449;
+            --bg-cream: #FAF9F6;
+        }
+
+        body { 
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; 
+            background-color: var(--bg-cream); 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0;
+        }
+
+        #game-container { 
+            background: white; padding: 40px; border-radius: 40px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            width: 95%; max-width: 600px; text-align: center; border: 8px solid var(--light-green);
+        }
+
+        h1 { color: var(--main-green); font-size: 1.8rem; margin-top: 0; }
+        
+        .intro-text { color: #5D6D7E; line-height: 1.6; margin-bottom: 25px; text-align: left; background: #f9f9f9; padding: 20px; border-radius: 20px; border: 1px solid #eee; }
+
+        .scene-info { 
+            background: var(--light-green); padding: 25px; border-radius: 30px; 
+            margin-bottom: 25px; border: 2px solid #C8E6C9; min-height: 80px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .en { font-size: 1.35rem; font-weight: 800; color: var(--dark-green); line-height: 1.4; }
+
+        .hint-bar { 
+            background: #FFF9C4; padding: 12px; border-radius: 15px; 
+            margin-bottom: 25px; font-size: 0.95rem; border: 1px solid #F9E79F; color: #7D6608;
+        }
+
+        input[type="text"] { 
+            width: 100%; padding: 18px; border: 3px solid #E5E8E8; border-radius: 20px; 
+            font-size: 1.2rem; box-sizing: border-box; text-align: center; outline: none; margin-bottom: 15px;
+        }
+
+        .btn-main { 
+            background-color: var(--main-green); color: white; border: none;
+            padding: 18px; border-radius: 20px; font-size: 1.2rem; font-weight: bold; 
+            width: 100%; cursor: pointer; box-shadow: 0 6px 0 var(--dark-green); margin-bottom: 15px;
+        }
+
+        #feedback { 
+            margin-top: 20px; min-height: 110px; padding: 20px; border-radius: 25px; 
+            display: none; align-items: center; gap: 20px; text-align: left;
+        }
+        .fb-score { font-size: 1.5rem; font-weight: 900; white-space: nowrap; flex-shrink: 0; min-width: 90px; text-align: center; }
+        .fb-divider { width: 2px; height: 60px; background: rgba(0,0,0,0.1); flex-shrink: 0; }
+        .fb-text { font-size: 1.05rem; line-height: 1.5; flex-grow: 1; }
+
+        .fb-correct { background: #E8F8F5; color: #148F77; border: 2px solid #A3E4D7; display: flex !important; }
+        .fb-try { background: #FDEDEC; color: #943126; border: 2px solid #FADBD8; display: flex !important; }
+
+        .summary-item { 
+            background: #FDFEFE; margin-bottom: 15px; padding: 20px; 
+            border-radius: 30px; border: 1px solid #EBEDEF; position: relative; text-align: left;
+        }
+        .score-badge { position: absolute; right: 20px; top: 20px; padding: 5px 15px; border-radius: 12px; font-weight: 900; color: white; }
+        .s10 { background: var(--main-green); } .s9, .s8 { background: #F39C12; } .s5 { background: #E74C3C; }
+
+        .ai-suggestion { 
+            margin-top: 15px; background-color: #F4F6F7; padding: 12px 20px; 
+            border-radius: 18px; font-size: 0.9rem; display: flex; align-items: center;
+        }
+        .ai-suggestion b { color: var(--main-green); margin-right: 10px; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="start-screen">
+        <div style="font-size: 5rem; margin-bottom: 15px;">🧭</div>
+        <h1>尋找地圖大冒險</h1>
+        <div class="intro-text">
+            <b>📜 遊戲介紹：</b><br>
+            邪惡的小精靈把冒險地圖藏起來了！你需要挑戰三個房間的觀察力測試。請根據聽到的題目，寫出正確的位置。<br><br>
+            <b>⭐ 得分規則：</b><br>
+            - <b>10分</b>：完整句子 (It is on the...)<br>
+            - <b>8分</b>：包含方位詞 (on the...)<br>
+            - <b>5分</b>：只有單字 (desk)
+        </div>
+        <button class="btn-main" onclick="startGame()">開始探險</button>
+    </div>
+
+    <div id="game-play" style="display:none;">
+        <div class="scene-info">
+            <span class="en" id="text-en"></span>
+            <button style="background:#A5D6A7; border:none; color:white; border-radius:8px; padding:4px 10px; cursor:pointer; align-self:center; margin-top:10px;" id="btn-show-zh" onclick="document.getElementById('zh-box').style.display='block'; this.style.display='none'">查看翻譯</button>
+            <div id="zh-box" style="display:none; color: #7D6608; font-size: 0.9rem; margin-top:10px; border-top: 1px solid #C8E6C9; padding-top:10px;"></div>
+        </div>
+
+        <div class="hint-bar" id="dynamic-hint">💡 小撇步：使用 <b>It is...</b> 開頭得分最高喔！</div>
+
+        <input type="text" id="user-input" placeholder="請在此輸入英文答案..." onkeypress="if(event.key==='Enter')checkAnswer()">
+        <button class="btn-main" onclick="checkAnswer()">確認答案</button>
+        <button style="background:none; border:2px solid var(--main-green); color:var(--main-green); padding:12px; border-radius:20px; width:100%; cursor:pointer; font-weight:bold;" onclick="speakText()">🔊 再聽一次題目</button>
+        
+        <div id="feedback">
+            <div class="fb-score" id="fb-score-val"></div>
+            <div class="fb-divider"></div>
+            <div class="fb-text" id="fb-text-val"></div>
+        </div>
+    </div>
+
+    <div id="end-screen" style="display:none;">
+        <div style="font-size: 4rem; margin-bottom: 10px;">🏆</div>
+        <h2 style="color:var(--main-green);">探險回顧</h2>
+        <div id="summary-content"></div>
+        <button class="btn-main" onclick="location.reload()">重新挑戰</button>
+    </div>
+</div>
+
+<script>
+    const questionBank = {
+        bedroom: [
+            { id: "bed", en: "Is the key on the desk or under the bed?", zh: "鑰匙在桌上還是在床底？", pre: ["on", "under"], items: ["desk", "bed"] },
+            { id: "bed", en: "Is the bag behind the door or on the chair?", zh: "書包在門後還是在椅子上？", pre: ["behind", "on"], items: ["door", "chair"] },
+            { id: "bed", en: "Is the ball under the table or in the box?", zh: "球在桌子下面還是在箱子裡？", pre: ["under", "in"], items: ["table", "box"] }
+        ],
+        kitchen: [
+            { id: "kit", en: "Is the apple in the fridge or on the table?", zh: "蘋果在冰箱裡還是在桌上？", pre: ["in", "on"], items: ["fridge", "table"] },
+            { id: "kit", en: "Is the milk in the glass or on the counter?", zh: "牛奶在杯子裡還是在櫃檯上？", pre: ["in", "on"], items: ["glass", "counter"] }
+        ],
+        livingRoom: [
+            { id: "liv", en: "The map is not behind the TV. It is next to the sofa. Where is it?", zh: "地圖不在電視後面，在沙發旁邊。地圖在哪裡？", pre: ["next to"], items: ["sofa"], negative: ["behind", "tv"] },
+            { id: "liv", en: "The map is not under the rug. It is on the armchair. Where is it?", zh: "地圖不在地毯下面，在扶手椅子上。地圖在哪裡？", pre: ["on"], items: ["armchair"], negative: ["under", "rug"] }
+        ]
+    };
+
+    let selectedScenes = [];
+    let currentLevel = 0, playerHistory = [];
+
+    function startGame() {
+        selectedScenes = [
+            questionBank.bedroom[Math.floor(Math.random() * questionBank.bedroom.length)],
+            questionBank.kitchen[Math.floor(Math.random() * questionBank.kitchen.length)],
+            questionBank.livingRoom[Math.floor(Math.random() * questionBank.livingRoom.length)]
+        ];
+        document.getElementById('start-screen').style.display = "none";
+        document.getElementById('game-play').style.display = "block";
+        updateScene();
+    }
+
+    function updateScene() {
+        if (currentLevel < selectedScenes.length) {
+            const s = selectedScenes[currentLevel];
+            
+            // --- UX 修正：切換新題時隱藏上回的建議 ---
+            const fb = document.getElementById('feedback');
+            fb.style.display = "none"; 
+            fb.className = ""; 
+            
+            document.getElementById('user-input').value = "";
+            document.getElementById('text-en').innerText = s.en;
+            document.getElementById('zh-box').innerText = s.zh;
+            document.getElementById('zh-box').style.display = "none";
+            document.getElementById('btn-show-zh').style.display = "inline-block";
+            
+            const hint = document.getElementById('dynamic-hint');
+            hint.innerHTML = (s.id === "liv") ? "💡 提醒：這關一定要用 <b>The map...</b> 開頭喔！" : "💡 小撇步：使用 <b>It is...</b> 開頭得分最高喔！";
+
+            setTimeout(() => { speakText(); }, 500);
+            document.getElementById('user-input').focus();
+        } else { showEndScreen(); }
+    }
+
+    function speakText() {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(selectedScenes[currentLevel].en);
+        utter.lang = 'en-US'; utter.rate = 0.8; window.speechSynthesis.speak(utter);
+    }
+
+    function checkAnswer() {
+        const input = document.getElementById('user-input').value.toLowerCase().trim();
+        if (!input) return;
+
+        const s = selectedScenes[currentLevel];
+        const fb = document.getElementById('feedback');
+        const scoreVal = document.getElementById('fb-score-val');
+        const textVal = document.getElementById('fb-text-val');
+
+        // --- 優化後的 "or" 攔截與精準建議 ---
+        if (input.includes(" or ") || input === "or") {
+            fb.className = "fb-try";
+            fb.style.display = "flex";
+            scoreVal.innerText = "請作答";
+            textVal.innerHTML = "<b>AI 建議：</b>請不要把『or』寫進來喔！請選一個位置回答，並記得加上<b>主詞 (It/The map)</b> 以及 <b>is</b> 變成完整句子。";
+            return;
+        }
+
+        // 客廳題開頭檢查
+        if (s.id === "liv" && !input.startsWith("the map")) {
+            fb.className = "fb-try";
+            fb.style.display = "flex";
+            scoreVal.innerText = "格式錯誤";
+            textVal.innerHTML = "<b>AI 建議：</b>這關請練習以『The map is...』開頭來回答地圖的位置！";
+            return;
+        }
+
+        // 負面陷阱檢查
+        if (s.negative && s.negative.some(n => input.includes(n))) {
+            fb.className = "fb-try";
+            fb.style.display = "flex";
+            scoreVal.innerText = "Oops!";
+            textVal.innerHTML = "<b>讀錯線索了！</b><br>題目說地圖『不在』那裡喔，再仔細聽一遍。";
+            return;
+        }
+
+        // 關鍵單字檢查
+        if (!s.items.some(item => input.includes(item))) {
+            fb.className = "fb-try";
+            fb.style.display = "flex";
+            scoreVal.innerText = "單字錯誤";
+            textVal.innerHTML = "<b>找不到物品：</b>檢查一下單字拼法是否正確？";
+            return;
+        }
+
+        // 計分邏輯
+        let score = 5, aiTip = "答對了！加上方位詞分數會更高喔！";
+        const hasPre = s.pre.some(p => input.includes(p));
+        const hasIs = input.includes("is") || input.includes("'s");
+        const words = input.split(/\s+/);
+
+        if (hasIs && hasPre) {
+            if (words[0] === "is") {
+                score = 9; aiTip = "差一點！肯定句不能把「is」放在句首喔。";
+            } else {
+                score = 10; aiTip = "完美的句子！你是英文小天才！🌟";
+            }
+        } else if (hasPre) {
+            score = 8; aiTip = "很棒！如果加上「is」變成完整句子會更厲害！✨";
+        }
+
+        playerHistory.push({ title: s.en, answer: input, score: score, tip: aiTip });
+        fb.className = "fb-correct";
+        fb.style.display = "flex";
+        scoreVal.innerText = `+${score} 分`;
+        textVal.innerHTML = `<b>成功找到！</b><br>${aiTip}`;
+        
+        setTimeout(() => { currentLevel++; updateScene(); }, 3000);
+    }
+
+    function showEndScreen() {
+        document.getElementById('game-play').style.display = "none";
+        document.getElementById('end-screen').style.display = "block";
+        let html = "";
+        playerHistory.forEach(h => {
+            html += `<div class="summary-item">
+                        <span class="score-badge s${h.score}">${h.score} 分</span>
+                        <b style="color:var(--main-green); font-size: 0.85rem;">📍 ${h.title}</b><br>
+                        <span style="font-size:0.9rem; color:#7F8C8D;">我的回答：${h.answer}</span>
+                        ${h.score < 10 ? `<div class="ai-suggestion"><b>🤖 AI 建議</b> <span>${h.tip}</span></div>` : ''}
+                     </div>`;
+        });
+        document.getElementById('summary-content').innerHTML = html;
+    }
+</script>
+</body>
+</html>
