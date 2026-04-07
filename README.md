@@ -2,6 +2,11 @@
 
 這是一個專為國小三、四年級學生設計的 AI 互動英語學習遊戲。
 
+
+## 🚀 立即開始遊戲
+ [👉 點擊此處開始遊戲 👈](https://weddy1225-blip.github.io/AI-English06/)
+
+
 ### 🎯 教學目標
 * 練習方位介係詞 (on, under, behind, next to, in)。
 * 培養完整句型寫作習慣 (It is... / The map is...)。
