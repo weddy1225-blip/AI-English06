@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌟 尋找地圖大冒險 🌟</title>
+    <title>🌟 尋找地圖：100題終極挑戰 🌟</title>
     <style>
         :root { 
             --main-green: #27AE60;
@@ -27,6 +27,12 @@
 
         h1 { color: var(--main-green); font-size: 1.8rem; margin-top: 0; }
         
+        .progress-bar {
+            background: #f0f0f0; border-radius: 10px; margin-bottom: 20px;
+            font-weight: bold; color: var(--dark-green); padding: 5px;
+            font-size: 0.9rem;
+        }
+
         .intro-text { color: #5D6D7E; line-height: 1.6; margin-bottom: 25px; text-align: left; background: #f9f9f9; padding: 20px; border-radius: 20px; border: 1px solid #eee; }
 
         .scene-info { 
@@ -63,48 +69,48 @@
         .fb-correct { background: #E8F8F5; color: #148F77; border: 2px solid #A3E4D7; display: flex !important; }
         .fb-try { background: #FDEDEC; color: #943126; border: 2px solid #FADBD8; display: flex !important; }
 
+        /* 修正結尾清單，防止分數遮擋文字 */
         .summary-item { 
             background: #FDFEFE; margin-bottom: 15px; padding: 20px; 
-            border-radius: 30px; border: 1px solid #EBEDEF; position: relative; text-align: left;
+            border-radius: 25px; border: 1px solid #EBEDEF; 
+            text-align: left; display: flex; flex-direction: column; gap: 10px;
         }
-        .score-badge { position: absolute; right: 20px; top: 20px; padding: 5px 15px; border-radius: 12px; font-weight: 900; color: white; }
+        .summary-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+        .summary-title { font-weight: bold; color: #34495E; flex-grow: 1; line-height: 1.4; }
+        .score-badge { padding: 4px 12px; border-radius: 10px; font-weight: 900; color: white; white-space: nowrap; font-size: 0.9rem; }
         .s10 { background: var(--main-green); } .s9, .s8 { background: #F39C12; } .s5 { background: #E74C3C; }
-
-        .ai-suggestion { 
-            margin-top: 15px; background-color: #F4F6F7; padding: 12px 20px; 
-            border-radius: 18px; font-size: 0.9rem; display: flex; align-items: center;
-        }
-        .ai-suggestion b { color: var(--main-green); margin-right: 10px; flex-shrink: 0; }
+        .summary-answer { font-size: 0.9rem; color: #7F8C8D; border-top: 1px dashed #eee; padding-top: 8px; }
     </style>
 </head>
 <body>
 
 <div id="game-container">
     <div id="start-screen">
-        <div style="font-size: 5rem; margin-bottom: 15px;">🧭</div>
-        <h1>尋找地圖大冒險</h1>
+        <div style="font-size: 5rem; margin-bottom: 15px;">🌍</div>
+        <h1>尋找地圖：100題終極挑戰</h1>
         <div class="intro-text">
-            <b>📜 遊戲介紹：</b><br>
-            邪惡的小精靈把冒險地圖藏起來了！你需要挑戰三個房間的觀察力測試。請根據聽到的題目，寫出正確的位置。<br><br>
-            <b>⭐ 得分規則：</b><br>
-            - <b>10分</b>：完整句子 (It is on the...)<br>
-            - <b>8分</b>：包含方位詞 (on the...)<br>
-            - <b>5分</b>：只有單字 (desk)
+            <b>📜 冒險手冊：</b><br>
+            地圖庫擴充至 100 題！每一輪會隨機挑選 5 個不同的場景。<br><br>
+            <b>⭐ 得分秘訣：</b><br>
+            - 完整回答 (It is...) 拿滿分。<br>
+            - 最後一關地圖題請用 <b>The map is...</b>。
         </div>
-        <button class="btn-main" onclick="startGame()">開始探險</button>
+        <button class="btn-main" onclick="startGame()">開始 100 題冒險</button>
     </div>
 
     <div id="game-play" style="display:none;">
+        <div class="progress-bar" id="progress-text">Level 1 / 5</div>
+        
         <div class="scene-info">
             <span class="en" id="text-en"></span>
             <button style="background:#A5D6A7; border:none; color:white; border-radius:8px; padding:4px 10px; cursor:pointer; align-self:center; margin-top:10px;" id="btn-show-zh" onclick="document.getElementById('zh-box').style.display='block'; this.style.display='none'">查看翻譯</button>
             <div id="zh-box" style="display:none; color: #7D6608; font-size: 0.9rem; margin-top:10px; border-top: 1px solid #C8E6C9; padding-top:10px;"></div>
         </div>
 
-        <div class="hint-bar" id="dynamic-hint">💡 小撇步：使用 <b>It is...</b> 開頭得分最高喔！</div>
+        <div class="hint-bar" id="dynamic-hint">💡 記得主詞 + is 喔！</div>
 
         <input type="text" id="user-input" placeholder="請在此輸入英文答案..." onkeypress="if(event.key==='Enter')checkAnswer()">
-        <button class="btn-main" onclick="checkAnswer()">確認答案</button>
+        <button class="btn-main" id="submit-btn" onclick="checkAnswer()">確認答案</button>
         <button style="background:none; border:2px solid var(--main-green); color:var(--main-green); padding:12px; border-radius:20px; width:100%; cursor:pointer; font-weight:bold;" onclick="speakText()">🔊 再聽一次題目</button>
         
         <div id="feedback">
@@ -116,7 +122,7 @@
 
     <div id="end-screen" style="display:none;">
         <div style="font-size: 4rem; margin-bottom: 10px;">🏆</div>
-        <h2 style="color:var(--main-green);">探險回顧</h2>
+        <h2 style="color:var(--main-green);">冒險完成！</h2>
         <div id="summary-content"></div>
         <button class="btn-main" onclick="location.reload()">重新挑戰</button>
     </div>
@@ -127,15 +133,122 @@
         bedroom: [
             { id: "bed", en: "Is the key on the desk or under the bed?", zh: "鑰匙在桌上還是在床底？", pre: ["on", "under"], items: ["desk", "bed"] },
             { id: "bed", en: "Is the bag behind the door or on the chair?", zh: "書包在門後還是在椅子上？", pre: ["behind", "on"], items: ["door", "chair"] },
-            { id: "bed", en: "Is the ball under the table or in the box?", zh: "球在桌子下面還是在箱子裡？", pre: ["under", "in"], items: ["table", "box"] }
+            { id: "bed", en: "Is the ball under the table or in the box?", zh: "球在桌子下面還是在箱子裡？", pre: ["under", "in"], items: ["table", "box"] },
+            { id: "bed", en: "Is the teddy bear on the bed or under the desk?", zh: "泰迪熊在床上還是在桌子下面？", pre: ["on", "under"], items: ["bed", "desk"] },
+            { id: "bed", en: "Is the hat in the drawer or on the shelf?", zh: "帽子在抽屜裡還是在架子上？", pre: ["in", "on"], items: ["drawer", "shelf"] },
+            { id: "bed", en: "Is the robot next to the lamp or under the rug?", zh: "機器人在燈旁邊還是在地毯下面？", pre: ["next to", "under"], items: ["lamp", "rug"] },
+            { id: "bed", en: "Is the book on the pillow or behind the computer?", zh: "書在枕頭上還是在電腦後面？", pre: ["on", "behind"], items: ["pillow", "computer"] },
+            { id: "bed", en: "Is the sock in the shoe or under the cabinet?", zh: "襪子在鞋子裡還是在櫃子下面？", pre: ["in", "under"], items: ["shoe", "cabinet"] },
+            { id: "bed", en: "Is the pencil next to the notebook or on the floor?", zh: "鉛筆在筆記本旁邊還是在地板上？", pre: ["next to", "on"], items: ["notebook", "floor"] },
+            { id: "bed", en: "Is the guitar behind the curtain or on the stand?", zh: "吉他在窗簾後還是在架子上？", pre: ["behind", "on"], items: ["curtain", "stand"] }
         ],
         kitchen: [
             { id: "kit", en: "Is the apple in the fridge or on the table?", zh: "蘋果在冰箱裡還是在桌上？", pre: ["in", "on"], items: ["fridge", "table"] },
-            { id: "kit", en: "Is the milk in the glass or on the counter?", zh: "牛奶在杯子裡還是在櫃檯上？", pre: ["in", "on"], items: ["glass", "counter"] }
+            { id: "kit", en: "Is the milk in the glass or on the counter?", zh: "牛奶在杯子裡還是在櫃檯上？", pre: ["in", "on"], items: ["glass", "counter"] },
+            { id: "kit", en: "Is the cat on the chair or under the cupboard?", zh: "貓咪在椅子上還是在櫥櫃下面？", pre: ["on", "under"], items: ["chair", "cupboard"] },
+            { id: "kit", en: "Is the spoon in the bowl or next to the plate?", zh: "湯匙在碗裡還是在盤子旁邊？", pre: ["in", "next to"], items: ["bowl", "plate"] },
+            { id: "kit", en: "Is the bread in the toaster or on the tray?", zh: "麵包在烤麵包機裡還是在托盤上？", pre: ["in", "on"], items: ["toaster", "tray"] },
+            { id: "kit", en: "Is the water in the bottle or next to the sink?", zh: "水在瓶子裡還是在水槽旁邊？", pre: ["in", "next to"], items: ["bottle", "sink"] },
+            { id: "kit", en: "Is the knife on the board or in the drawer?", zh: "刀子在砧板上還是在抽屜裡？", pre: ["on", "in"], items: ["board", "drawer"] },
+            { id: "kit", en: "Is the egg under the box or on the stove?", zh: "蛋在盒子下面還是在爐子上？", pre: ["under", "on"], items: ["box", "stove"] },
+            { id: "kit", en: "Is the banana next to the orange or in the basket?", zh: "香蕉在橘子旁邊還是在籃子裡？", pre: ["next to", "in"], items: ["orange", "basket"] },
+            { id: "kit", en: "Is the cookie in the jar or on the napkin?", zh: "餅乾在罐子裡還是在餐巾上？", pre: ["in", "on"], items: ["jar", "napkin"] }
+        ],
+        bathroom: [
+            { id: "bat", en: "Is the brush next to the mirror or in the sink?", zh: "刷子在鏡子旁邊還是在洗臉台裡？", pre: ["next to", "in"], items: ["mirror", "sink"] },
+            { id: "bat", en: "Is the towel on the rack or behind the door?", zh: "毛巾在架子上還是在門後？", pre: ["on", "behind"], items: ["rack", "door"] },
+            { id: "bat", en: "Is the duck in the tub or under the stool?", zh: "小鴨在浴缸裡還是在板凳下面？", pre: ["in", "under"], items: ["tub", "stool"] },
+            { id: "bat", en: "Is the soap on the dish or in the box?", zh: "肥皂在肥皂盤上還是在盒子裡？", pre: ["on", "in"], items: ["dish", "box"] },
+            { id: "bat", en: "Is the paper next to the toilet or on the shelf?", zh: "衛生紙在馬桶旁邊還是在架子上？", pre: ["next to", "on"], items: ["toilet", "shelf"] },
+            { id: "bat", en: "Is the shampoo in the basket or behind the bottle?", zh: "洗髮精在籃子裡還是在瓶子後面？", pre: ["in", "behind"], items: ["basket", "bottle"] },
+            { id: "bat", en: "Is the comb on the mat or under the towel?", zh: "梳子在墊子上還是在毛巾下面？", pre: ["on", "under"], items: ["mat", "towel"] },
+            { id: "bat", en: "Is the toothpaste next to the cup or in the bag?", zh: "牙膏在杯子旁邊還是在袋子裡？", pre: ["next to", "in"], items: ["cup", "bag"] },
+            { id: "bat", en: "Is the ring in the tray or on the counter?", zh: "戒指在托盤裡還是在櫃檯上？", pre: ["in", "on"], items: ["tray", "counter"] },
+            { id: "bat", en: "Is the plant behind the curtain or next to the window?", zh: "植物在窗簾後還是在窗戶旁邊？", pre: ["behind", "next to"], items: ["curtain", "window"] }
+        ],
+        park: [
+            { id: "par", en: "Is the bird on the tree or under the bench?", zh: "鳥在樹上還是在長椅下面？", pre: ["on", "under"], items: ["tree", "bench"] },
+            { id: "par", en: "Is the bike behind the bush or next to the fountain?", zh: "腳踏車在灌木叢後還是在噴水池旁邊？", pre: ["behind", "next to"], items: ["bush", "fountain"] },
+            { id: "par", en: "Is the dog under the slide or on the grass?", zh: "狗狗在溜滑梯下面還是在草地上？", pre: ["under", "on"], items: ["slide", "grass"] },
+            { id: "par", en: "Is the kite in the sky or on the fence?", zh: "風箏在天空裡還是在圍欄上？", pre: ["in", "on"], items: ["sky", "fence"] },
+            { id: "par", en: "Is the ball next to the swing or under the car?", zh: "球在鞦韆旁邊還是在車子下面？", pre: ["next to", "under"], items: ["swing", "car"] },
+            { id: "par", en: "Is the flower in the pot or behind the rock?", zh: "花在盆子裡還是在石頭後面？", pre: ["in", "behind"], items: ["pot", "rock"] },
+            { id: "par", en: "Is the bee on the leaf or next to the rose?", zh: "蜜蜂在葉子上還是在玫瑰旁邊？", pre: ["on", "next to"], items: ["leaf", "rose"] },
+            { id: "par", en: "Is the squirrel in the tree or under the bridge?", zh: "松鼠在樹上還是在橋下面？", pre: ["in", "under"], items: ["tree", "bridge"] },
+            { id: "par", en: "Is the hat on the boy or behind the bag?", zh: "帽子在男孩頭上還是在包包後面？", pre: ["on", "behind"], items: ["boy", "bag"] },
+            { id: "par", en: "Is the phone on the table or next to the bin?", zh: "手機在桌子上還是在垃圾桶旁邊？", pre: ["on", "next to"], items: ["table", "bin"] }
+        ],
+        classroom: [
+            { id: "cla", en: "Is the ruler in the desk or on the chair?", zh: "尺在書桌裡還是在椅子上？", pre: ["in", "on"], items: ["desk", "chair"] },
+            { id: "cla", en: "Is the globe next to the window or on the shelf?", zh: "地球儀在窗戶旁邊還是在架子上？", pre: ["next to", "on"], items: ["window", "shelf"] },
+            { id: "cla", en: "Is the map behind the board or in the box?", zh: "地圖在黑板後還是在箱子裡？", pre: ["behind", "in"], items: ["board", "box"] },
+            { id: "cla", en: "Is the marker on the tray or under the desk?", zh: "彩色筆在托盤上還是在桌子下面？", pre: ["on", "under"], items: ["tray", "desk"] },
+            { id: "cla", en: "Is the pen in the case or next to the book?", zh: "筆在筆盒裡還是在書旁邊？", pre: ["in", "next to"], items: ["case", "book"] },
+            { id: "cla", en: "Is the bag on the floor or behind the door?", zh: "書包在地板上還是在門後？", pre: ["on", "behind"], items: ["floor", "door"] },
+            { id: "cla", en: "Is the glue next to the scissors or in the bin?", zh: "膠水在剪刀旁邊還是在垃圾桶裡？", pre: ["next to", "in"], items: ["scissors", "bin"] },
+            { id: "cla", en: "Is the clock on the wall or under the table?", zh: "時鐘在牆上還是在桌子下面？", pre: ["on", "under"], items: ["wall", "table"] },
+            { id: "cla", en: "Is the paper in the folder or on the desk?", zh: "紙在資料夾裡還是在桌上？", pre: ["in", "on"], items: ["folder", "desk"] },
+            { id: "cla", en: "Is the chair next to the desk or behind the teacher?", zh: "椅子在書桌旁邊還是在老師後面？", pre: ["next to", "behind"], items: ["desk", "teacher"] }
+        ],
+        library: [
+            { id: "lib", en: "Is the book on the shelf or under the table?", zh: "書在架子上還是在桌子下面？", pre: ["on", "under"], items: ["shelf", "table"] },
+            { id: "lib", en: "Is the lamp next to the computer or on the desk?", zh: "燈在電腦旁邊還是在書桌上？", pre: ["next to", "on"], items: ["computer", "desk"] },
+            { id: "lib", en: "Is the bag behind the chair or in the locker?", zh: "包包在椅子後還是在置物櫃裡？", pre: ["behind", "in"], items: ["chair", "locker"] },
+            { id: "lib", en: "Is the plant next to the window or on the cart?", zh: "植物在窗戶旁邊還是在推車上？", pre: ["next to", "on"], items: ["window", "cart"] },
+            { id: "lib", en: "Is the card in the wallet or under the book?", zh: "卡片在皮夾裡還是在書下面？", pre: ["in", "under"], items: ["wallet", "book"] },
+            { id: "lib", en: "Is the poster on the wall or behind the door?", zh: "海報在牆上還是在門後？", pre: ["on", "behind"], items: ["wall", "door"] },
+            { id: "lib", en: "Is the pen next to the notebook or in the drawer?", zh: "筆在筆記本旁邊還是在抽屜裡？", pre: ["next to", "in"], items: ["notebook", "drawer"] },
+            { id: "lib", en: "Is the water in the bottle or on the floor?", zh: "水在瓶子裡還是在地板上？", pre: ["in", "on"], items: ["bottle", "floor"] },
+            { id: "lib", en: "Is the glasses on the magazine or under the chair?", zh: "眼鏡在雜誌上還是在椅子下面？", pre: ["on", "under"], items: ["magazine", "chair"] },
+            { id: "lib", en: "Is the key in the bag or next to the phone?", zh: "鑰匙在包包裡還是在電話旁邊？", pre: ["in", "next to"], items: ["bag", "phone"] }
+        ],
+        supermarket: [
+            { id: "sup", en: "Is the milk in the fridge or on the shelf?", zh: "牛奶在冰箱裡還是在架子上？", pre: ["in", "on"], items: ["fridge", "shelf"] },
+            { id: "sup", en: "Is the bread next to the cake or in the basket?", zh: "麵包在蛋糕旁邊還是在籃子裡？", pre: ["next to", "in"], items: ["cake", "basket"] },
+            { id: "sup", en: "Is the cart behind the door or next to the bin?", zh: "推車在門後還是在垃圾桶旁邊？", pre: ["behind", "next to"], items: ["door", "bin"] },
+            { id: "sup", en: "Is the apple in the bag or on the counter?", zh: "蘋果在袋子裡還是在櫃檯上？", pre: ["in", "on"], items: ["bag", "counter"] },
+            { id: "sup", en: "Is the chocolate under the box or next to the gum?", zh: "巧克力在盒子下面還是在口香糖旁邊？", pre: ["under", "next to"], items: ["box", "gum"] },
+            { id: "sup", en: "Is the juice on the top shelf or in the cooler?", zh: "果汁在最上層架子還是在冷藏櫃？", pre: ["on", "in"], items: ["shelf", "cooler"] },
+            { id: "sup", en: "Is the fish behind the glass or on the ice?", zh: "魚在玻璃後還是在冰上？", pre: ["behind", "on"], items: ["glass", "ice"] },
+            { id: "sup", en: "Is the soap next to the shampoo or in the aisle?", zh: "肥皂在洗髮精旁邊還是在走道？", pre: ["next to", "in"], items: ["shampoo", "aisle"] },
+            { id: "sup", en: "Is the egg in the carton or under the table?", zh: "蛋在蛋盒裡還是在桌子下面？", pre: ["in", "under"], items: ["carton", "table"] },
+            { id: "sup", en: "Is the money in the pocket or on the machine?", zh: "錢在口袋裡還是在機器上？", pre: ["in", "on"], items: ["pocket", "machine"] }
+        ],
+        beach: [
+            { id: "bea", en: "Is the crab under the sand or in the water?", zh: "螃蟹在沙子下還是在水裡？", pre: ["under", "in"], items: ["sand", "water"] },
+            { id: "bea", en: "Is the towel on the chair or behind the umbrella?", zh: "毛巾在椅子上還是在雨傘後？", pre: ["on", "behind"], items: ["chair", "umbrella"] },
+            { id: "bea", en: "Is the ball next to the shell or on the boat?", zh: "球在貝殼旁邊還是在船上？", pre: ["next to", "on"], items: ["shell", "boat"] },
+            { id: "bea", en: "Is the hat in the bag or on the head?", zh: "帽子在袋子裡還是在頭上？", pre: ["in", "on"], items: ["bag", "head"] },
+            { id: "bea", en: "Is the fish in the net or under the rock?", zh: "魚在網子裡還是在石頭下面？", pre: ["in", "under"], items: ["net", "rock"] },
+            { id: "bea", en: "Is the sandal on the mat or next to the shoe?", zh: "涼鞋在墊子上還是在鞋子旁邊？", pre: ["on", "next to"], items: ["mat", "shoe"] },
+            { id: "bea", en: "Is the ice cream in the cone or on the plate?", zh: "冰淇淋在甜筒裡還是在盤子上？", pre: ["in", "on"], items: ["cone", "plate"] },
+            { id: "bea", en: "Is the bird behind the cloud or on the tree?", zh: "鳥在雲後還是在樹上？", pre: ["behind", "on"], items: ["cloud", "tree"] },
+            { id: "bea", en: "Is the watch in the pocket or next to the glasses?", zh: "手錶在口袋裡還是在眼鏡旁邊？", pre: ["in", "next to"], items: ["pocket", "glasses"] },
+            { id: "bea", en: "Is the kite in the sky or under the tent?", zh: "風箏在天空裡還是在帳篷下？", pre: ["in", "under"], items: ["sky", "tent"] }
+        ],
+        office: [
+            { id: "off", en: "Is the phone on the desk or in the drawer?", zh: "電話在桌上還是在抽屜裡？", pre: ["on", "in"], items: ["desk", "drawer"] },
+            { id: "off", en: "Is the printer next to the computer or under the table?", zh: "印表機在電腦旁邊還是在桌子下面？", pre: ["next to", "under"], items: ["computer", "table"] },
+            { id: "off", en: "Is the file in the cabinet or on the shelf?", zh: "檔案在櫃子裡還是在架子上？", pre: ["in", "on"], items: ["cabinet", "shelf"] },
+            { id: "off", en: "Is the coffee in the mug or on the floor?", zh: "咖啡在馬克杯裡還是在地板上？", pre: ["in", "on"], items: ["mug", "floor"] },
+            { id: "off", en: "Is the stamp next to the letter or in the box?", zh: "郵票在信旁邊還是在箱子裡？", pre: ["next to", "in"], items: ["letter", "box"] },
+            { id: "off", en: "Is the clock behind the plant or on the wall?", zh: "時鐘在植物後還是在牆上？", pre: ["behind", "on"], items: ["plant", "wall"] },
+            { id: "off", en: "Is the pen under the paper or next to the mouse?", zh: "筆在紙下面還是在滑鼠旁邊？", pre: ["under", "next to"], items: ["paper", "mouse"] },
+            { id: "off", en: "Is the key in the lock or on the ring?", zh: "鑰匙在鎖裡還是在環上？", pre: ["in", "on"], items: ["lock", "ring"] },
+            { id: "off", en: "Is the card behind the monitor or in the wallet?", zh: "卡片在螢幕後還是在皮夾裡？", pre: ["behind", "in"], items: ["monitor", "wallet"] },
+            { id: "off", en: "Is the chair next to the window or under the light?", zh: "椅子在窗戶旁邊還是在燈下面？", pre: ["next to", "under"], items: ["window", "light"] }
         ],
         livingRoom: [
             { id: "liv", en: "The map is not behind the TV. It is next to the sofa. Where is it?", zh: "地圖不在電視後面，在沙發旁邊。地圖在哪裡？", pre: ["next to"], items: ["sofa"], negative: ["behind", "tv"] },
-            { id: "liv", en: "The map is not under the rug. It is on the armchair. Where is it?", zh: "地圖不在地毯下面，在扶手椅子上。地圖在哪裡？", pre: ["on"], items: ["armchair"], negative: ["under", "rug"] }
+            { id: "liv", en: "The map is not under the rug. It is on the armchair. Where is it?", zh: "地圖不在地毯下面，在扶手椅子上。地圖在哪裡？", pre: ["on"], items: ["armchair"], negative: ["under", "rug"] },
+            { id: "liv", en: "The map is not on the coffee table. It is behind the picture. Where is it?", zh: "地圖不在咖啡桌上，在畫的後面。地圖在哪裡？", pre: ["behind"], items: ["picture"], negative: ["on", "coffee table"] },
+            { id: "liv", en: "The map is not next to the lamp. It is in the drawer. Where is it?", zh: "地圖不在燈旁邊，在抽屜裡。地圖在哪裡？", pre: ["in"], items: ["drawer"], negative: ["next to", "lamp"] },
+            { id: "liv", en: "The map is not in the cabinet. It is under the cushion. Where is it?", zh: "地圖不在櫃子裡，在墊子下面。地圖在哪裡？", pre: ["under"], items: ["cushion"], negative: ["in", "cabinet"] },
+            { id: "liv", en: "The map is not behind the clock. It is on the shelf. Where is it?", zh: "地圖不在時鐘後面，在架子上。地圖在哪裡？", pre: ["on"], items: ["shelf"], negative: ["behind", "clock"] },
+            { id: "liv", en: "The map is not under the sofa. It is next to the plant. Where is it?", zh: "地圖不在沙發下面，在植物旁邊。地圖在哪裡？", pre: ["next to"], items: ["plant"], negative: ["under", "sofa"] },
+            { id: "liv", en: "The map is not on the piano. It is in the box. Where is it?", zh: "地圖不在鋼琴上，在箱子裡。地圖在哪裡？", pre: ["in"], items: ["box"], negative: ["on", "piano"] },
+            { id: "liv", en: "The map is not next to the door. It is under the rug. Where is it?", zh: "地圖不在門旁邊，在地毯下面。地圖在哪裡？", pre: ["under"], items: ["rug"], negative: ["next to", "door"] },
+            { id: "liv", en: "The map is not in the vase. It is behind the curtains. Where is it?", zh: "地圖不在花瓶裡，在窗簾後面。地圖在哪裡？", pre: ["behind"], items: ["curtains"], negative: ["in", "vase"] }
         ]
     };
 
@@ -143,25 +256,28 @@
     let currentLevel = 0, playerHistory = [];
 
     function startGame() {
+        const shuffle = (array) => array.sort(() => Math.random() - 0.5);
+        const sceneKeys = shuffle(Object.keys(questionBank).filter(k => k !== "livingRoom"));
+        
         selectedScenes = [
-            questionBank.bedroom[Math.floor(Math.random() * questionBank.bedroom.length)],
-            questionBank.kitchen[Math.floor(Math.random() * questionBank.kitchen.length)],
-            questionBank.livingRoom[Math.floor(Math.random() * questionBank.livingRoom.length)]
+            shuffle([...questionBank[sceneKeys[0]]])[0],
+            shuffle([...questionBank[sceneKeys[1]]])[0],
+            shuffle([...questionBank[sceneKeys[2]]])[0],
+            shuffle([...questionBank[sceneKeys[3]]])[0],
+            shuffle([...questionBank.livingRoom])[0]
         ];
+
         document.getElementById('start-screen').style.display = "none";
         document.getElementById('game-play').style.display = "block";
+        currentLevel = 0; playerHistory = [];
         updateScene();
     }
 
     function updateScene() {
         if (currentLevel < selectedScenes.length) {
             const s = selectedScenes[currentLevel];
-            
-            // --- UX 修正：切換新題時隱藏上回的建議 ---
-            const fb = document.getElementById('feedback');
-            fb.style.display = "none"; 
-            fb.className = ""; 
-            
+            document.getElementById('feedback').style.display = "none";
+            document.getElementById('progress-text').innerText = `Level ${currentLevel + 1} / ${selectedScenes.length}`;
             document.getElementById('user-input').value = "";
             document.getElementById('text-en').innerText = s.en;
             document.getElementById('zh-box').innerText = s.zh;
@@ -169,7 +285,7 @@
             document.getElementById('btn-show-zh').style.display = "inline-block";
             
             const hint = document.getElementById('dynamic-hint');
-            hint.innerHTML = (s.id === "liv") ? "💡 提醒：這關一定要用 <b>The map...</b> 開頭喔！" : "💡 小撇步：使用 <b>It is...</b> 開頭得分最高喔！";
+            hint.innerHTML = (s.id === "liv") ? "💡 地圖題！請用 <b>The map is...</b>" : "💡 請用 <b>It is...</b> 拿高分！";
 
             setTimeout(() => { speakText(); }, 500);
             document.getElementById('user-input').focus();
@@ -191,65 +307,49 @@
         const scoreVal = document.getElementById('fb-score-val');
         const textVal = document.getElementById('fb-text-val');
 
-        // --- 優化後的 "or" 攔截與精準建議 ---
-        if (input.includes(" or ") || input === "or") {
-            fb.className = "fb-try";
-            fb.style.display = "flex";
-            scoreVal.innerText = "請作答";
-            textVal.innerHTML = "<b>AI 建議：</b>請不要把『or』寫進來喔！請選一個位置回答，並記得加上<b>主詞 (It/The map)</b> 以及 <b>is</b> 變成完整句子。";
+        if (input.includes(" or ")) {
+            fb.className = "fb-try"; fb.style.display = "flex";
+            scoreVal.innerText = "不要 or"; textVal.innerHTML = "請選一個位置回答。";
             return;
         }
 
-        // 客廳題開頭檢查
         if (s.id === "liv" && !input.startsWith("the map")) {
-            fb.className = "fb-try";
-            fb.style.display = "flex";
-            scoreVal.innerText = "格式錯誤";
-            textVal.innerHTML = "<b>AI 建議：</b>這關請練習以『The map is...』開頭來回答地圖的位置！";
+            fb.className = "fb-try"; fb.style.display = "flex";
+            scoreVal.innerText = "開頭錯誤"; textVal.innerHTML = "地圖題請練習用『The map is...』開頭。";
             return;
         }
 
-        // 負面陷阱檢查
+        const hasCorrectPre = s.pre.some(p => input.includes(p));
+        const hasCorrectItem = s.items.some(item => input.includes(item));
+
+        if (hasCorrectPre && hasCorrectItem) {
+            let score = 5;
+            let aiTip = "答對了！";
+            const hasIs = input.includes("is") || input.includes("'s");
+            if (hasIs) { score = 10; aiTip = "完美的完整句子！🌟"; }
+            else { score = 8; aiTip = "很棒！加上 is 會更完美。"; }
+
+            playerHistory.push({ title: s.en, answer: input, score: score });
+            fb.className = "fb-correct"; fb.style.display = "flex";
+            scoreVal.innerText = `+${score}`; textVal.innerHTML = aiTip;
+            
+            document.getElementById('submit-btn').disabled = true;
+            setTimeout(() => { 
+                currentLevel++; 
+                document.getElementById('submit-btn').disabled = false;
+                updateScene(); 
+            }, 3000);
+            return;
+        }
+
         if (s.negative && s.negative.some(n => input.includes(n))) {
-            fb.className = "fb-try";
-            fb.style.display = "flex";
-            scoreVal.innerText = "Oops!";
-            textVal.innerHTML = "<b>讀錯線索了！</b><br>題目說地圖『不在』那裡喔，再仔細聽一遍。";
+            fb.className = "fb-try"; fb.style.display = "flex";
+            scoreVal.innerText = "陷阱！"; textVal.innerHTML = "題目說『不在』那裡喔。";
             return;
         }
 
-        // 關鍵單字檢查
-        if (!s.items.some(item => input.includes(item))) {
-            fb.className = "fb-try";
-            fb.style.display = "flex";
-            scoreVal.innerText = "單字錯誤";
-            textVal.innerHTML = "<b>找不到物品：</b>檢查一下單字拼法是否正確？";
-            return;
-        }
-
-        // 計分邏輯
-        let score = 5, aiTip = "答對了！加上方位詞分數會更高喔！";
-        const hasPre = s.pre.some(p => input.includes(p));
-        const hasIs = input.includes("is") || input.includes("'s");
-        const words = input.split(/\s+/);
-
-        if (hasIs && hasPre) {
-            if (words[0] === "is") {
-                score = 9; aiTip = "差一點！肯定句不能把「is」放在句首喔。";
-            } else {
-                score = 10; aiTip = "完美的句子！你是英文小天才！🌟";
-            }
-        } else if (hasPre) {
-            score = 8; aiTip = "很棒！如果加上「is」變成完整句子會更厲害！✨";
-        }
-
-        playerHistory.push({ title: s.en, answer: input, score: score, tip: aiTip });
-        fb.className = "fb-correct";
-        fb.style.display = "flex";
-        scoreVal.innerText = `+${score} 分`;
-        textVal.innerHTML = `<b>成功找到！</b><br>${aiTip}`;
-        
-        setTimeout(() => { currentLevel++; updateScene(); }, 3000);
+        fb.className = "fb-try"; fb.style.display = "flex";
+        scoreVal.innerText = "單字錯誤"; textVal.innerHTML = "物品或位置不對喔，再檢查一下。";
     }
 
     function showEndScreen() {
@@ -258,10 +358,11 @@
         let html = "";
         playerHistory.forEach(h => {
             html += `<div class="summary-item">
-                        <span class="score-badge s${h.score}">${h.score} 分</span>
-                        <b style="color:var(--main-green); font-size: 0.85rem;">📍 ${h.title}</b><br>
-                        <span style="font-size:0.9rem; color:#7F8C8D;">我的回答：${h.answer}</span>
-                        ${h.score < 10 ? `<div class="ai-suggestion"><b>🤖 AI 建議</b> <span>${h.tip}</span></div>` : ''}
+                        <div class="summary-header">
+                            <div class="summary-title">📍 ${h.title}</div>
+                            <div class="score-badge s${h.score}">${h.score}分</div>
+                        </div>
+                        <div class="summary-answer">我的回答：${h.answer}</div>
                      </div>`;
         });
         document.getElementById('summary-content').innerHTML = html;
